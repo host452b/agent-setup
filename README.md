@@ -15,6 +15,26 @@ bash install.sh                  # install (prompts before high-risk steps)
 
 Requires `jq`. Install hint is printed if missing.
 
+## One-line install
+
+```bash
+# macOS / Linux / WSL / Git-Bash (Windows)
+curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash
+
+# preview without installing
+curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
+```
+
+Prefer to inspect before running (recommended):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh -o bootstrap.sh
+less bootstrap.sh
+bash bootstrap.sh
+```
+
+The bootstrap caches the repo at `~/.agent-setup` (override with `AGENT_SETUP_HOME`) and re-runs are fast. Native Windows PowerShell support arrives with the Windows driver; until then use Git-Bash.
+
 ## Flags
 
 - `--dry-run` / `--plan` — print the resolved plan, mutate nothing

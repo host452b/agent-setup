@@ -15,3 +15,12 @@
   in the plan up front.
 - **Global installs** (e.g. `uipro --global`) are flagged with
   `install_scope: global` and may mutate PATH depending on your npm prefix.
+
+## Bootstrap one-liner tradeoff
+
+`curl … | bash` is pipe-to-shell — the very pattern this project avoids for the
+installers it runs. We offer it for convenience but recommend the inspect-first
+variant (download `bootstrap.sh`, read it, then run it), or a plain
+`git clone` + `bash install.sh`. The bootstrap itself only fetches the repo
+(git clone, or a tarball downloaded to a temp file then extracted — never piped
+to a shell) and then runs the local `install.sh`.
