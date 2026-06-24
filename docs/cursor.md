@@ -1,5 +1,9 @@
 # Cursor: a best-effort integration target
 
+"Cursor" here means the **Cursor CLI** — the `cursor-agent` binary (also invoked
+as `agent`), installed from `cursor.com/install`. It is **not** the Cursor IDE.
+Its config lives under `~/.cursor/`.
+
 `cursor-agent` exposes `mcp` and `generate-rule` but **no plugin-install
 command**. So Cursor coverage comes from each tool's own cross-agent path,
 not a marketplace install:
@@ -14,11 +18,11 @@ not a marketplace install:
   rules dir, or use the in-chat `/add-plugin` flow. The installer prints these
   steps; it cannot perform them.
 
-Cursor config paths (resolved by `lib/paths.sh`):
+Cursor-CLI config paths (resolved by `lib/paths.sh`) — `~/.cursor/` on every OS:
 
-| OS | Cursor user dir |
+| Path | Location |
 |---|---|
-| macOS | `~/Library/Application Support/Cursor/User/` |
-| Linux | `~/.config/Cursor/User/` |
-| WSL | Linux path (or `/mnt/c/Users/.../AppData/Roaming/Cursor/User/` if Cursor is on the Windows side) |
-| Windows | `%APPDATA%\Cursor\User\` |
+| user dir | `~/.cursor/` |
+| skills | `~/.cursor/skills/` |
+| rules | `~/.cursor/rules/` |
+| mcp config | `~/.cursor/mcp.json` |
