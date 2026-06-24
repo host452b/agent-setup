@@ -8,7 +8,7 @@ not a marketplace install:
 - **caveman** — its installer auto-detects Cursor
 - **taste-skill** — `npx skills add` targets Cursor's skills dir
 - **ui-ux-pro-max** — `npx uipro init --ai cursor` (lands in `~/.cursor/skills`)
-- **open-design** — `od mcp install cursor`
+- **open-design** — manual: install open-design first, then `od mcp install cursor` (its `od` CLI isn't auto-installable and collides with the system `od`)
 - **superpowers / ponytail** — manual: copy the rules file into the Cursor
   rules dir, or use the in-chat `/add-plugin` flow. The installer prints these
   steps; it cannot perform them.

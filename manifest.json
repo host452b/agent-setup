@@ -449,79 +449,91 @@
     "open-design": {
       "targets": {
         "claude": {
-          "method": "od-mcp",
-          "coverage": "partial",
+          "method": "manual",
+          "coverage": "manual",
           "platforms": [
             "darwin",
             "linux",
             "wsl",
             "windows"
           ],
-          "requires": [
-            "od"
-          ],
-          "args": {
-            "agent": "claude",
-            "expected_substr": "open-design"
-          },
+          "requires": [],
           "safety": {
-            "risk": "medium",
-            "network": true,
+            "risk": "low",
+            "network": false,
             "executes_remote_code": false,
             "requires_admin": false,
-            "requires_confirmation": true
+            "requires_confirmation": false
           },
-          "conflict_policy": "merge"
+          "manual": {
+            "reason": "open-design needs its own `od` CLI, which is not auto-installable headlessly and collides with the unix `od` (octal-dump).",
+            "steps": [
+              "Install open-design (desktop app from open-design.ai, Docker, or build from source)",
+              "Ensure open-designs `od` is first on PATH (the system /usr/bin/od shadows it)",
+              "Run: od mcp install claude"
+            ],
+            "verification": [
+              "Confirm the open-design MCP server is registered for claude"
+            ]
+          }
         },
         "codex": {
-          "method": "od-mcp",
-          "coverage": "partial",
+          "method": "manual",
+          "coverage": "manual",
           "platforms": [
             "darwin",
             "linux",
             "wsl",
             "windows"
           ],
-          "requires": [
-            "od"
-          ],
-          "args": {
-            "agent": "codex",
-            "expected_substr": "open-design"
-          },
+          "requires": [],
           "safety": {
-            "risk": "medium",
-            "network": true,
+            "risk": "low",
+            "network": false,
             "executes_remote_code": false,
             "requires_admin": false,
-            "requires_confirmation": true
+            "requires_confirmation": false
           },
-          "conflict_policy": "merge"
+          "manual": {
+            "reason": "open-design needs its own `od` CLI, which is not auto-installable headlessly and collides with the unix `od` (octal-dump).",
+            "steps": [
+              "Install open-design (desktop app from open-design.ai, Docker, or build from source)",
+              "Ensure open-designs `od` is first on PATH (the system /usr/bin/od shadows it)",
+              "Run: od mcp install codex"
+            ],
+            "verification": [
+              "Confirm the open-design MCP server is registered for codex"
+            ]
+          }
         },
         "cursor": {
-          "method": "od-mcp",
-          "coverage": "partial",
+          "method": "manual",
+          "coverage": "manual",
           "platforms": [
             "darwin",
             "linux",
             "wsl",
             "windows"
           ],
-          "requires": [
-            "od"
-          ],
-          "args": {
-            "agent": "cursor",
-            "expected_substr": "open-design"
-          },
+          "requires": [],
           "safety": {
-            "risk": "medium",
-            "network": true,
+            "risk": "low",
+            "network": false,
             "executes_remote_code": false,
             "requires_admin": false,
-            "requires_confirmation": true
+            "requires_confirmation": false
           },
-          "conflict_policy": "merge"
+          "manual": {
+            "reason": "open-design needs its own `od` CLI, which is not auto-installable headlessly and collides with the unix `od` (octal-dump).",
+            "steps": [
+              "Install open-design (desktop app from open-design.ai, Docker, or build from source)",
+              "Ensure open-designs `od` is first on PATH (the system /usr/bin/od shadows it)",
+              "Run: od mcp install cursor"
+            ],
+            "verification": [
+              "Confirm the open-design MCP server is registered for cursor"
+            ]
+          }
         }
       }
     },

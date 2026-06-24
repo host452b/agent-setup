@@ -58,7 +58,7 @@ Requires `jq` (the installer prints an install hint if it's missing).
 | caveman | ✅ auto ¹ | ✅ auto ¹ | ✅ auto ¹ |
 | taste-skill | ✅ auto ² | ✅ auto ² | ✅ auto ² |
 | ui-ux-pro-max | ✅ native | ✅ native | ✅ native |
-| open-design | ⚠️ partial | ⚠️ partial | ⚠️ partial |
+| open-design | 📋 manual | 📋 manual | 📋 manual |
 | prompt-polish | ✅ native | — | — |
 
 `native` = fully scripted · `partial` = scripted with a trust/interactive step · `manual` = the installer prints exact steps (no CLI exists) · `—` = unsupported by that plugin.
