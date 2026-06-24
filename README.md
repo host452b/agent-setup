@@ -4,7 +4,7 @@ One command installs your coding agents **and** their plugins/skills — reprodu
 
 It installs three agents — **Claude Code**, **Codex CLI**, **Cursor CLI** — then a curated plugin/skill set into all three at the user level, as far as each agent's install surface allows. Everything is declared in one `manifest.json`; the installer just reads it.
 
-> Native-Windows PowerShell (`install.ps1` / `bootstrap.ps1`) is not built yet — see [Status](#status). On Windows today, use Git-Bash.
+> Native-Windows PowerShell (`install.ps1` / `bootstrap.ps1`) is available (experimental) — see [Status](#status) and the Windows note below.
 
 ## One-line install
 
@@ -12,11 +12,14 @@ It installs three agents — **Claude Code**, **Codex CLI**, **Cursor CLI** — 
 # macOS / Linux / WSL / Git-Bash (Windows)
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash
 
-# unattended (auto-confirm high-risk steps; needed for the piped one-liner)
-curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --yes
-
 # preview the full plan without changing anything
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
+```
+
+```powershell
+# native Windows PowerShell (experimental)
+irm https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.ps1 | iex
+# with flags: download then run — irm .../bootstrap.ps1 -OutFile bootstrap.ps1; ./bootstrap.ps1 -DryRun
 ```
 
 Prerequisites (`jq`, `git`, `node`, `bun`) are **auto-installed by default** before anything else — `bun` via its user-level installer (no sudo), the rest via your package manager. Pass `--skip-prereqs` to manage them yourself. (`jq` is still required to parse the manifest; on a locked-down box without it, install `jq` first.)
@@ -114,14 +117,18 @@ The `curl … | bash` one-liner is itself pipe-to-shell; the inspect-first and `
 
 - ✅ **Unix driver** (`install.sh` + `lib/*.sh`) — macOS / Linux / WSL / Git-Bash.
 - ✅ **Bootstrap** (`bootstrap.sh`) — the one-line installer.
-- ⏳ **Native Windows** (`install.ps1` + `bootstrap.ps1` + Pester) — planned, mirroring the unix driver.
+- 🧪 **Native Windows** (`install.ps1` + `bootstrap.ps1`) — experimental, mirrors the unix driver (reads the same `manifest.json` via `ConvertFrom-Json`, no jq needed). Pure-function unit tests in `tests/windows-test.ps1`.
+
+**Windows notes:** `git-symlink` (prompt-polish/cursor) needs Developer Mode or admin for real symlinks — otherwise it falls back to a copy. `gstack` runs its bash `setup`, so it needs **Git for Windows** (bash on PATH); without it that step skips with a note. `bun`/agent installers use their PowerShell installers.
 
 ## Repo layout
 
 ```
-install.sh              # driver
-bootstrap.sh            # one-line installer
-manifest.json           # source of truth (agents + plugins)
+install.sh              # unix driver
+bootstrap.sh            # unix one-line installer
+install.ps1             # native-Windows driver (experimental)
+bootstrap.ps1           # Windows one-line installer
+manifest.json           # source of truth (agents + plugins) — shared by both drivers
 manifest.schema.json    # validated before any execution
 lib/                    # detect, paths, prereqs, privilege, manifest, checks, methods, report
 tests/                  # plain-bash test harness + suites
@@ -131,7 +138,8 @@ docs/                   # security.md, cursor.md, specs/, plans/
 ## Development
 
 ```bash
-bash tests/run.sh       # run all suites (no external test deps beyond jq)
+bash tests/run.sh                       # unix suites (no external test deps beyond jq)
+pwsh -NoProfile -File tests/windows-test.ps1   # Windows driver pure-function tests
 ```
 
 Design and implementation notes live under [`docs/superpowers/`](docs/superpowers/).

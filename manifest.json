@@ -322,7 +322,8 @@
             "node"
           ],
           "args": {
-            "url_unix": "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+            "url_unix": "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh",
+            "url_win": "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.ps1"
           },
           "safety": {
             "risk": "high",
