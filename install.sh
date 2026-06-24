@@ -76,7 +76,7 @@ _exec_entry() {
 MODE="install"          # install | dry-run | plan | status | check-prereqs
 DO_INSTALL_PREREQS=0
 F_AGENT=""; F_PLUGIN=""; F_METHOD=""
-AGENTS_ONLY=0; ASSUME_YES=0; NON_INTERACTIVE=0
+AGENTS_ONLY=0; ASSUME_YES=0; NON_INTERACTIVE=0   # default: 3s countdown then auto-yes
 
 usage() { grep -E '^\s+--' "$HERE/install.sh" | sed 's/) .*//' >&2; }
 
@@ -160,8 +160,16 @@ if [ -z "$F_PLUGIN" ] && [ -z "$F_METHOD" ]; then
     if tool_present "$bin"; then echo "agent $a present ($(tool_realpath "$bin"))"; continue; fi
     url="$(jq -r --arg a "$a" --arg os "$OS" '.agents[$a].install[$os]' "$MANIFEST")"
     echo "installing agent $a from $url"
-    confirm "  proceed?" || { echo "agent $a skipped"; continue; }
-    tmp="$(mktemp)"; curl -fsSL "$url" -o "$tmp" && bash "$tmp"; rm -f "$tmp"
+    confirm "  install agent $a?" || { echo "agent $a skipped"; continue; }
+    tmp="$(mktemp)"
+    if curl -fsSL "$url" -o "$tmp"; then
+      # run unattended; </dev/null stops child installers blocking on their own prompts
+      case "$a" in
+        codex) CODEX_NON_INTERACTIVE=1 bash "$tmp" </dev/null ;;
+        *)     bash "$tmp" </dev/null ;;
+      esac
+    fi
+    rm -f "$tmp"
   done
 fi
 [ "$AGENTS_ONLY" = "1" ] && exit 0

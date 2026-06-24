@@ -21,7 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap
 
 `jq` is required. On a fresh machine, either install it first (`brew install jq` / `apt-get install -y jq`) or add `--install-prereqs`.
 
-**Confirmation is auto-yes by default**: each step shows a 3-second countdown and proceeds unless you press `n`. Pass `--yes` to skip the countdown entirely, or `--non-interactive` to decline every privileged step (CI-safe).
+**Each step shows a 3-second countdown then auto-confirms (yes)** — press `n` within the window to decline that step. Pass `--yes` to skip the countdown entirely, or `--non-interactive` to decline every privileged step (CI-safe). Use `--dry-run` to review first. Agent installers run unattended (e.g. `CODEX_NON_INTERACTIVE=1`) so they don't block on their own prompts.
 
 Prefer to inspect before running (recommended — see [Security](docs/security.md)):
 
@@ -83,6 +83,7 @@ bash install.sh [flags]
   --agents-only          install only the agent binaries (step 1)
   --yes                  skip the 3s countdown; confirm everything immediately
   --non-interactive      decline every privileged step (CI-safe)
+                         (default: 3s countdown per step, then auto-yes)
 ```
 
 Flags pass through the bootstrap too: `… | bash -s -- --plugin gstack --dry-run`.
