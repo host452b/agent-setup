@@ -68,6 +68,11 @@ done
 # 1. detect OS  (overridable for tests)
 OS="${AGENT_SETUP_FORCE_OS:-$(detect_os)}"
 
+# 1b. install prereqs if requested
+if [ "$DO_INSTALL_PREREQS" = "1" ]; then
+  prereqs_install jq git node bun
+fi
+
 # 2-3. jq gate
 require_jq || exit 2
 
@@ -100,7 +105,7 @@ if [ "$MODE" = "status" ]; then
   n="$(jq 'length' <<<"$PLAN")"; i=0
   while [ "$i" -lt "$n" ]; do
     e="$(jq -c ".[$i]" <<<"$PLAN")"
-    if checks_run_after "$e"; then st="OK"; else st="missing"; fi
+    if ! checks_has_after "$e"; then st="no-check"; elif checks_run_after "$e"; then st="OK"; else st="missing"; fi
     printf '%s/%s: %s\n' "$(jq -r .plugin <<<"$e")" "$(jq -r .agent <<<"$e")" "$st"
     i=$((i + 1))
   done
@@ -123,7 +128,7 @@ if [ -z "$F_PLUGIN" ] && [ -z "$F_METHOD" ]; then
     url="$(jq -r --arg a "$a" --arg os "$OS" '.agents[$a].install[$os]' "$MANIFEST")"
     echo "installing agent $a from $url"
     [ "$ASSUME_YES" = "1" ] || { printf 'proceed? [y/N] '; read -r ans; [ "$ans" = "y" ] || continue; }
-    tmp="$(mktemp)"; curl -fsSL "$url" -o "$tmp" && sh "$tmp"; rm -f "$tmp"
+    tmp="$(mktemp)"; curl -fsSL "$url" -o "$tmp" && bash "$tmp"; rm -f "$tmp"
   done
 fi
 [ "$AGENTS_ONLY" = "1" ] && exit 0
@@ -133,7 +138,7 @@ n="$(jq 'length' <<<"$PLAN")"; i=0
 while [ "$i" -lt "$n" ]; do
   e="$(jq -c ".[$i]" <<<"$PLAN")"; i=$((i + 1))
   label="$(jq -r '.plugin' <<<"$e")/$(jq -r '.agent' <<<"$e")"
-  if checks_run_after "$e"; then echo "[$label] already satisfied — skip"; continue; fi
+  if checks_has_after "$e" && checks_run_after "$e"; then echo "[$label] already satisfied — skip"; continue; fi
   if [ "$(jq -r '.method' <<<"$e")" = "manual" ]; then
     echo "[$label] MANUAL:"; report_manual_steps "$e"; continue
   fi

@@ -11,4 +11,8 @@ assert_ok   check_eval "$(jq -n --arg p "$tmp/x.json" '{type:"json_path_exists",
 assert_fail check_eval "$(jq -n --arg p "$tmp/x.json" '{type:"json_path_exists",path:$p,query:".a.zzz"}')"
 # no after-checks => success
 assert_ok checks_run_after '{"checks":{}}'
+# checks_has_after
+assert_ok   checks_has_after '{"checks":{"after":[{"type":"command_exists","name":"jq"}]}}'
+assert_fail checks_has_after '{"checks":{}}'
+assert_fail checks_has_after '{"checks":{"after":[]}}'
 rm -rf "$tmp"

@@ -32,6 +32,11 @@ check_eval() { # <check_json>
   esac
 }
 
+checks_has_after() { # <plan_entry_json> — 0 if at least one after-check is defined
+  local n; n="$(jq '.checks.after | length // 0' <<<"$1" 2>/dev/null)"; n="${n:-0}"
+  [ "$n" != "0" ]
+}
+
 checks_run_after() { # <plan_entry_json>
   local n i c
   n="$(jq '.checks.after | length // 0' <<<"$1" 2>/dev/null)"; n="${n:-0}"

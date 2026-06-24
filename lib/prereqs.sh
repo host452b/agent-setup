@@ -23,6 +23,17 @@ prereqs_report() { # <name...>
   done
 }
 
+prereqs_install() { # <name...> — install any missing tools via the platform hint; returns 0 if all present/installed
+  local t rc=0
+  for t in "$@"; do
+    if tool_present "$t"; then continue; fi
+    local hint; hint="$(prereq_install_hint "$t")"
+    echo "installing prerequisite: $t  ->  $hint" >&2
+    sh -c "$hint" || { echo "failed to install $t" >&2; rc=1; }
+  done
+  return $rc
+}
+
 prereq_install_hint() { # <name>
   if   tool_present brew;   then echo "brew install $1"
   elif tool_present apt;    then echo "sudo apt install -y $1"
