@@ -23,12 +23,13 @@ confirm() {
   [ "$ASSUME_YES" = "1" ] && return 0
   [ -r /dev/tty ] || return 0
   local a="" s
+  local warn=$'\033[30;43;5m' off=$'\033[0m'   # black-on-yellow, blinking
   for s in 3 2 1; do
-    printf '\r%s  auto-yes in %ds (press n to decline) ' "$1" "$s" > /dev/tty
+    printf '\r%s  %s auto-yes in %ds %s (press n to decline) ' "$1" "$warn" "$s" "$off" > /dev/tty
     if read -t 1 -r a < /dev/tty; then break; fi
     a=""
   done
-  printf '\n' > /dev/tty
+  printf '\r\033[K%s  proceeding...\n' "$1" > /dev/tty
   _confirm_answer "$a"
 }
 
@@ -41,12 +42,11 @@ _exec_entry() {
       claude plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" \
       && claude plugin install "$(_arg "$e" '.args.plugin')@$(_arg "$e" '.args.marketplace_name')" ;;
     codex-plugin)
-      if ! codex plugin add --help >/dev/null 2>&1; then
-        echo "  codex 'plugin add' is unsupported by this codex version — upgrade codex, or install '$(_arg "$e" '.args.plugin')' via codex's /plugins UI. Skipping." >&2
-        return 3
-      fi
-      codex plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" \
-      && codex plugin add "$(_arg "$e" '.args.plugin')" ;;
+      local cp_plugin; cp_plugin="$(_arg "$e" '.args.plugin')"
+      codex plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" >/dev/null 2>&1 || true
+      if codex plugin add "$cp_plugin" 2>/dev/null; then return 0; fi
+      echo "  codex 'plugin add' unsupported by this codex version — upgrade codex (npm i -g @openai/codex) or install '$cp_plugin' via codex's /plugins UI" >&2
+      return 3 ;;
     shell-installer)
       local tmp; tmp="$(mktemp)"; curl -fsSL "$(_arg "$e" '.args.url_unix')" -o "$tmp" && bash "$tmp"; rm -f "$tmp" ;;
     npx-skills)
@@ -175,33 +175,57 @@ fi
 [ "$AGENTS_ONLY" = "1" ] && exit 0
 
 # 9. execute plan entries
-S_OK=""; S_SKIP=""; S_MANUAL=""; S_FAIL=""
+REPORT="$(mktemp)"   # tsv: status<TAB>label<TAB>reason
+record() { printf '%s\t%s\t%s\n' "$1" "$2" "$3" >> "$REPORT"; }
+last_line() { grep -v '^[[:space:]]*$' | tail -1 | sed 's/^[[:space:]]*//'; }
+
 n="$(jq 'length' <<<"$PLAN")"; i=0
 while [ "$i" -lt "$n" ]; do
   e="$(jq -c ".[$i]" <<<"$PLAN")"; i=$((i + 1))
   label="$(jq -r '.plugin' <<<"$e")/$(jq -r '.agent' <<<"$e")"
-  if checks_has_after "$e" && checks_run_after "$e"; then echo "[$label] already satisfied — skip"; S_OK="$S_OK $label"; continue; fi
+  if checks_has_after "$e" && checks_run_after "$e"; then
+    echo "[$label] already satisfied — skip"; record ok "$label" "already installed"; continue
+  fi
   if [ "$(jq -r '.method' <<<"$e")" = "manual" ]; then
-    echo "[$label] MANUAL:"; report_manual_steps "$e"; S_MANUAL="$S_MANUAL $label"; continue
+    echo "[$label] MANUAL:"; report_manual_steps "$e"
+    record manual "$label" "$(jq -r '.manual.reason // "see steps"' <<<"$e")"; continue
   fi
   hi="$(jq -r '(.safety.executes_remote_code // false) or (.safety.requires_admin // false)' <<<"$e")"
   if [ "$hi" = "true" ]; then
     echo "[$label] high-risk:"; method_plan "$e" | sed 's/^/    $ /'
-    confirm "[$label] proceed?" || { echo "[$label] skipped"; S_SKIP="$S_SKIP $label"; continue; }
+    confirm "[$label] proceed?" || { echo "[$label] skipped"; record skip "$label" "declined"; continue; }
   fi
   echo "[$label] executing:"; method_plan "$e" | sed 's/^/    $ /'
-  _exec_entry "$e"; rc=$?
+  out="$(mktemp)"
+  _exec_entry "$e" 2>&1 | tee "$out"; rc="${PIPESTATUS[0]}"
+  reason="$(last_line < "$out")"; rm -f "$out"
   case "$rc" in
-    0) S_OK="$S_OK $label" ;;
-    3) echo "[$label] skipped"; S_SKIP="$S_SKIP $label" ;;
-    *) echo "[$label] FAILED" >&2; S_FAIL="$S_FAIL $label" ;;
+    0) record ok "$label" "installed" ;;
+    3) echo "[$label] skipped"; record skip "$label" "${reason:-skipped}" ;;
+    *) echo "[$label] FAILED" >&2; record fail "$label" "${reason:-error}" ;;
   esac
 done
 
-echo ""
-echo "=== summary ==="
-echo "ok:     ${S_OK:- (none)}"
-echo "skipped:${S_SKIP:- (none)}"
-echo "manual: ${S_MANUAL:- (none)}"
-echo "failed: ${S_FAIL:- (none)}"
-[ -z "$S_FAIL" ]
+# 10. report — concise, grouped, saved to a file
+RUNDIR="${AGENT_SETUP_HOME:-$HOME/.agent-setup}"; mkdir -p "$RUNDIR"
+REPORT_FILE="$RUNDIR/last-install-report.txt"
+print_group() { # <key> <heading> <symbol>
+  local cnt; cnt="$(awk -F'\t' -v k="$1" '$1==k' "$REPORT" | wc -l | tr -d ' ')"
+  [ "$cnt" = 0 ] && return 0
+  printf '\n%s (%s):\n' "$2" "$cnt"
+  awk -F'\t' -v k="$1" -v s="$3" '$1==k {printf "  %s %-22s %s\n", s, $2, $3}' "$REPORT"
+}
+{
+  echo "================ agent-setup report ================"
+  echo "OS: $OS"
+  print_group ok     "OK"      "+"
+  print_group skip   "SKIPPED" "-"
+  print_group manual "MANUAL"  "*"
+  print_group fail   "FAILED"  "x"
+  echo "===================================================="
+} | tee "$REPORT_FILE"
+echo "report saved: $REPORT_FILE"
+
+fail_n="$(awk -F'\t' '$1=="fail"' "$REPORT" | wc -l | tr -d ' ')"
+rm -f "$REPORT"
+[ "$fail_n" = 0 ]

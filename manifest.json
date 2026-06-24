@@ -418,22 +418,20 @@
             "node"
           ],
           "args": {
-            "ensure": "uipro",
-            "ensure_install": "npm install -g uipro-cli",
-            "command": "uipro init --ai codex"
+            "command": "npx --yes -p uipro-cli uipro init --ai codex"
           },
           "safety": {
             "risk": "medium",
             "network": true,
-            "executes_remote_code": false,
+            "executes_remote_code": true,
             "requires_admin": false,
             "requires_confirmation": true
           },
           "checks": {
             "after": [
               {
-                "type": "command_exists",
-                "name": "uipro"
+                "type": "dir_exists",
+                "path": "${HOME}/.codex/skills/ui-ux-pro-max"
               }
             ]
           },
@@ -452,22 +450,20 @@
             "node"
           ],
           "args": {
-            "ensure": "uipro",
-            "ensure_install": "npm install -g uipro-cli",
-            "command": "uipro init --ai cursor"
+            "command": "npx --yes -p uipro-cli uipro init --ai cursor"
           },
           "safety": {
             "risk": "medium",
             "network": true,
-            "executes_remote_code": false,
+            "executes_remote_code": true,
             "requires_admin": false,
             "requires_confirmation": true
           },
           "checks": {
             "after": [
               {
-                "type": "command_exists",
-                "name": "uipro"
+                "type": "dir_exists",
+                "path": "${HOME}/.cursor/skills/ui-ux-pro-max"
               }
             ]
           },

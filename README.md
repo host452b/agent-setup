@@ -31,7 +31,7 @@ less bootstrap.sh
 bash bootstrap.sh
 ```
 
-The bootstrap caches the repo at `~/.agent-setup` (override with `AGENT_SETUP_HOME`); re-runs are fast and idempotent.
+The bootstrap caches the repo at `~/.agent-setup` (override with `AGENT_SETUP_HOME`); re-runs are fast and idempotent. After each run a grouped report (OK / SKIPPED / MANUAL / FAILED, with reasons) prints and is saved to `~/.agent-setup/last-install-report.txt`.
 
 ## Manual install
 
