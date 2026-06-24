@@ -1,19 +1,10 @@
 # agent-setup
 
-One command installs Claude Code, Codex CLI, and Cursor CLI, then a curated
-plugin/skill set into all three at the user level — across macOS, Linux, WSL,
-and Git-Bash on Windows. (Native-Windows PowerShell driver: see Plan 2.)
+One command installs your coding agents **and** their plugins/skills — reproducibly, across **macOS, Linux, WSL, and Windows (Git-Bash)**.
 
-## Quick start
+It installs three agents — **Claude Code**, **Codex CLI**, **Cursor CLI** — then a curated plugin/skill set into all three at the user level, as far as each agent's install surface allows. Everything is declared in one `manifest.json`; the installer just reads it.
 
-```bash
-git clone https://github.com/host452b/agent-setup.git
-cd agent-setup
-bash install.sh --dry-run        # preview: prints the plan, changes nothing
-bash install.sh                  # install (prompts before high-risk steps)
-```
-
-Requires `jq`. Install hint is printed if missing.
+> Native-Windows PowerShell (`install.ps1` / `bootstrap.ps1`) is not built yet — see [Status](#status). On Windows today, use Git-Bash.
 
 ## One-line install
 
@@ -21,11 +12,11 @@ Requires `jq`. Install hint is printed if missing.
 # macOS / Linux / WSL / Git-Bash (Windows)
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash
 
-# preview without installing
+# preview the full plan without changing anything
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
 ```
 
-Prefer to inspect before running (recommended):
+Prefer to inspect before running (recommended — see [Security](docs/security.md)):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh -o bootstrap.sh
@@ -33,32 +24,105 @@ less bootstrap.sh
 bash bootstrap.sh
 ```
 
-The bootstrap caches the repo at `~/.agent-setup` (override with `AGENT_SETUP_HOME`) and re-runs are fast. Native Windows PowerShell support arrives with the Windows driver; until then use Git-Bash.
+The bootstrap caches the repo at `~/.agent-setup` (override with `AGENT_SETUP_HOME`); re-runs are fast and idempotent.
 
-## Flags
+## Manual install
 
-- `--dry-run` / `--plan` — print the resolved plan, mutate nothing
-- `--status` — show what's already installed
-- `--check-prereqs` — report tool presence (jq, git, node, bun, agents)
-- `--install-prereqs` — opt-in: auto-install prereqs via brew/apt/winget
-- `--agent <claude|codex|cursor>` — scope to one agent
-- `--plugin <name>` — scope to one plugin
-- `--only-method <type>` — scope to one method type
-- `--agents-only` — install only the agent binaries (step 1)
-- `--yes` — auto-confirm high-risk steps
-- `--non-interactive` — CI mode; fail on any privileged step
+```bash
+git clone https://github.com/host452b/agent-setup.git
+cd agent-setup
+bash install.sh --dry-run     # preview
+bash install.sh               # install (prompts before high-risk steps)
+```
+
+Requires `jq` (the installer prints an install hint if it's missing).
 
 ## What gets installed
 
-Agents: Claude Code, Codex CLI, Cursor CLI.
-Plugins/skills: superpowers, ponytail, gstack, caveman, taste-skill,
-ui-ux-pro-max, open-design, prompt-polish.
+**Agents:** Claude Code · Codex CLI · Cursor CLI.
 
-Coverage varies by agent — Cursor is a best-effort integration target
-(no plugin-install CLI); see `docs/cursor.md`. The full plugin × agent ×
-method matrix lives in `manifest.json`.
+**Plugins / skills** (per-agent coverage — the full matrix lives in [`manifest.json`](manifest.json)):
 
-## Adding a plugin
+| Plugin | Claude Code | Codex CLI | Cursor |
+|---|---|---|---|
+| superpowers | ✅ native | ⚠️ partial | 📋 manual |
+| ponytail | ✅ native | ⚠️ partial | 📋 manual |
+| gstack | ✅ native | ✅ native | ✅ native |
+| caveman | ✅ auto ¹ | ✅ auto ¹ | ✅ auto ¹ |
+| taste-skill | ✅ auto ² | ✅ auto ² | ✅ auto ² |
+| ui-ux-pro-max | ✅ native | ✅ native | ✅ native |
+| open-design | ⚠️ partial | ⚠️ partial | ⚠️ partial |
+| prompt-polish | ✅ native | — | — |
 
-Edit `manifest.json` (validated against `manifest.schema.json`). No script
-changes needed for supported method types.
+`native` = fully scripted · `partial` = scripted with a trust/interactive step · `manual` = the installer prints exact steps (no CLI exists) · `—` = unsupported by that plugin.
+
+¹ caveman runs one installer (`curl … | bash`) that auto-detects and configures every supported agent present.
+² taste-skill installs via `npx skills add`, which lands in the detected agents' skills directories.
+
+**Cursor is a best-effort integration target** — `cursor-agent` has no plugin-install CLI, so coverage comes from each tool's own cross-agent path (skills dir, rules file, MCP, `npx skills`). See [`docs/cursor.md`](docs/cursor.md).
+
+## Flags
+
+```
+bash install.sh [flags]
+
+  --dry-run | --plan     print the resolved plan, change nothing
+  --status               show what is already installed
+  --check-prereqs        report tool presence (jq, git, node, bun, agents)
+  --install-prereqs      install missing prerequisites via brew/apt/winget
+  --agent <name>         scope to one agent: claude | codex | cursor
+  --plugin <name>        scope to one plugin
+  --only-method <type>   scope to one method type
+  --agents-only          install only the agent binaries (step 1)
+  --yes                  auto-confirm high-risk steps
+  --non-interactive      CI mode; fail on any privileged step
+```
+
+Flags pass through the bootstrap too: `… | bash -s -- --plugin gstack --dry-run`.
+
+## How it works
+
+`manifest.json` (validated against `manifest.schema.json`) is the single source of truth. Each `(plugin, agent)` target declares a **method**, its **coverage**, supported **platforms**, **safety** metadata, idempotency **checks**, and a **conflict policy**. The driver runs a fixed order:
+
+```
+detect OS → verify jq → validate manifest → resolve plan
+   → privilege preflight → execute (or dry-run) → after-checks → report
+```
+
+Method types include `claude-plugin` / `codex-plugin` (marketplace + install), `shell-installer` (`curl`-then-run), `npx-skills`, `git-setup` (`./setup --host …`), `npm-cli` (`uipro`), `od-mcp` (`od mcp install`), `file-copy`, and `manual`. Adding a plugin is usually just a manifest edit — no script change.
+
+## Security
+
+- **Dry-run first** — `--dry-run` prints every command and changes nothing.
+- **Confirmation** — steps that run remote code or need admin prompt unless `--yes`; `--non-interactive` refuses them.
+- **download-then-run** — remote installers are downloaded to a temp file and executed from disk, never piped straight into a shell.
+- **PATH-shadow guard** — external tools are resolved by real path and verified before use (notably `od`, which collides with the unix octal-dump binary).
+- **Least privilege** — the script is never run under sudo wholesale; only the specific steps that need it request it, surfaced in the plan up front.
+
+The `curl … | bash` one-liner is itself pipe-to-shell; the inspect-first and `git clone` paths above avoid that. Full details: [`docs/security.md`](docs/security.md).
+
+## Status
+
+- ✅ **Unix driver** (`install.sh` + `lib/*.sh`) — macOS / Linux / WSL / Git-Bash.
+- ✅ **Bootstrap** (`bootstrap.sh`) — the one-line installer.
+- ⏳ **Native Windows** (`install.ps1` + `bootstrap.ps1` + Pester) — planned, mirroring the unix driver.
+
+## Repo layout
+
+```
+install.sh              # driver
+bootstrap.sh            # one-line installer
+manifest.json           # source of truth (agents + plugins)
+manifest.schema.json    # validated before any execution
+lib/                    # detect, paths, prereqs, privilege, manifest, checks, methods, report
+tests/                  # plain-bash test harness + suites
+docs/                   # security.md, cursor.md, specs/, plans/
+```
+
+## Development
+
+```bash
+bash tests/run.sh       # run all suites (no external test deps beyond jq)
+```
+
+Design and implementation notes live under [`docs/superpowers/`](docs/superpowers/).
