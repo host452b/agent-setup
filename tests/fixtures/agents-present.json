@@ -1,0 +1,1 @@
+{ "os": "darwin", "agents": { "claude": { "present": true }, "codex": { "present": false }, "cursor": { "present": true } } }

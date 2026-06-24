@@ -17,3 +17,27 @@ manifest_validate() { # <file>
      ] | all)
   ' "$f" >/dev/null
 }
+
+manifest_resolve_plan() { # <file> <os> <agents_json>
+  local f="$1" os="$2" agents="$3"
+  jq --arg os "$os" --argjson agents "$agents" '
+    [ .plugins | to_entries[] as $p
+      | ($p.value.targets | to_entries[]) as $t
+      | select($t.value.platforms | index($os))
+      | select(($agents.agents[$t.key].present // false) == true)
+      | {
+          plugin:          $p.key,
+          agent:           $t.key,
+          method:          $t.value.method,
+          coverage:        $t.value.coverage,
+          requires:        ($t.value.requires // []),
+          install_scope:   ($t.value.install_scope // "user"),
+          args:            ($t.value.args // {}),
+          manual:          ($t.value.manual // null),
+          safety:          ($t.value.safety // {}),
+          checks:          ($t.value.checks // {}),
+          conflict_policy: ($t.value.conflict_policy // "skip")
+        }
+    ]
+  ' "$f"
+}
