@@ -283,6 +283,27 @@
             "requires_confirmation": true
           },
           "conflict_policy": "skip"
+        },
+        "cursor": {
+          "method": "unsupported",
+          "coverage": "unsupported",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [],
+          "safety": {
+            "risk": "low",
+            "network": false,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "manual": {
+            "reason": "gstack has no Cursor host (supports claude/codex/kiro/factory/opencode/openclaw/hermes/gbrain)"
+          }
         }
       }
     },
@@ -573,6 +594,48 @@
             ]
           },
           "conflict_policy": "skip"
+        },
+        "codex": {
+          "method": "unsupported",
+          "coverage": "unsupported",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [],
+          "safety": {
+            "risk": "low",
+            "network": false,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "manual": {
+            "reason": "prompt-polish is a Claude Code plugin only; no Codex support"
+          }
+        },
+        "cursor": {
+          "method": "unsupported",
+          "coverage": "unsupported",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [],
+          "safety": {
+            "risk": "low",
+            "network": false,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "manual": {
+            "reason": "prompt-polish is a Claude Code plugin only; no Cursor support"
+          }
         }
       }
     }

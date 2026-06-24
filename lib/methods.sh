@@ -41,6 +41,9 @@ method_plan() { # <entry_json>
     file-copy)
       printf 'copy %s -> %s\n' "$(_arg "$e" '.args.src')" "$(_arg "$e" '.args.dest')"
       ;;
+    unsupported)
+      printf 'N/A: %s\n' "$(_arg "$e" '.manual.reason')"
+      ;;
     manual)
       printf 'MANUAL: %s\n' "$(_arg "$e" '.manual.reason')"
       ;;

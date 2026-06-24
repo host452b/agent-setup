@@ -191,6 +191,10 @@ while [ "$i" -lt "$n" ]; do
   if checks_has_after "$e" && checks_run_after "$e"; then
     echo "[$label] already satisfied — skip"; record ok "$label" "already installed"; continue
   fi
+  if [ "$(jq -r '.method' <<<"$e")" = "unsupported" ]; then
+    rsn="$(jq -r '.manual.reason // "not supported by this tool"' <<<"$e")"
+    echo "[$label] N/A — $rsn"; record na "$label" "$rsn"; continue
+  fi
   if [ "$(jq -r '.method' <<<"$e")" = "manual" ]; then
     echo "[$label] MANUAL:"; report_manual_steps "$e"
     record manual "$label" "$(jq -r '.manual.reason // "see steps"' <<<"$e")"; continue
@@ -214,8 +218,8 @@ done
 # 10. report — concise, grouped, saved to a file
 RUNDIR="${AGENT_SETUP_HOME:-$HOME/.agent-setup}"; mkdir -p "$RUNDIR"
 REPORT_FILE="$RUNDIR/last-install-report.txt"
-C_GREEN=$'\033[32m'; C_YEL=$'\033[33m'; C_CYAN=$'\033[36m'; C_RED=$'\033[31m'; C_OFF=$'\033[0m'
-[ -n "${NO_COLOR:-}" ] && { C_GREEN=""; C_YEL=""; C_CYAN=""; C_RED=""; C_OFF=""; }
+C_GREEN=$'\033[32m'; C_YEL=$'\033[33m'; C_CYAN=$'\033[36m'; C_RED=$'\033[31m'; C_GRAY=$'\033[90m'; C_OFF=$'\033[0m'
+[ -n "${NO_COLOR:-}" ] && { C_GREEN=""; C_YEL=""; C_CYAN=""; C_RED=""; C_GRAY=""; C_OFF=""; }
 print_group() { # <key> <heading> <symbol> <color>
   local cnt; cnt="$(awk -F'\t' -v k="$1" '$1==k' "$REPORT" | wc -l | tr -d ' ')"
   [ "$cnt" = 0 ] && return 0
@@ -229,6 +233,7 @@ STRIP="s/$(printf '\033')\\[[0-9;]*m//g"
   print_group ok     "OK"      "+" "$C_GREEN"
   print_group skip   "SKIPPED" "-" "$C_YEL"
   print_group manual "MANUAL"  "*" "$C_CYAN"
+  print_group na     "N/A"     "." "$C_GRAY"
   print_group fail   "FAILED"  "x" "$C_RED"
   echo "===================================================="
 } | tee >(sed "$STRIP" > "$REPORT_FILE")
