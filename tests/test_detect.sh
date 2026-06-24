@@ -8,5 +8,5 @@ assert_eq "wsl"     "$(detect_os_from Linux 'Linux 5.15 microsoft-standard-WSL2'
 assert_eq "windows" "$(detect_os_from MINGW64_NT-10.0 '')" "git-bash windows"
 out="$(HOME=/h detect_agents_json linux)"
 assert_eq "linux" "$(echo "$out" | jq -r .os)" "json os"
-assert_eq "/h/.config/Cursor/User/rules" "$(echo "$out" | jq -r .agents.cursor.rules_dir)" "json cursor rules"
+assert_eq "/h/.cursor/rules" "$(echo "$out" | jq -r .agents.cursor.rules_dir)" "json cursor rules"
 assert_contains "$(echo "$out" | jq -r '.agents.claude.present|type')" "boolean" "claude present is boolean"
