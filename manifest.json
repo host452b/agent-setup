@@ -596,46 +596,72 @@
           "conflict_policy": "skip"
         },
         "codex": {
-          "method": "unsupported",
-          "coverage": "unsupported",
+          "method": "codex-plugin",
+          "coverage": "partial",
           "platforms": [
             "darwin",
             "linux",
             "wsl",
             "windows"
           ],
-          "requires": [],
+          "requires": [
+            "codex"
+          ],
+          "args": {
+            "marketplace_src": "host452b/prompt-polish",
+            "marketplace_name": "prompt-polish",
+            "plugin": "prompt-polish"
+          },
           "safety": {
-            "risk": "low",
-            "network": false,
+            "risk": "medium",
+            "network": true,
             "executes_remote_code": false,
             "requires_admin": false,
-            "requires_confirmation": false
+            "requires_confirmation": true
           },
-          "manual": {
-            "reason": "prompt-polish is a Claude Code plugin only; no Codex support"
-          }
+          "checks": {
+            "after": [
+              {
+                "type": "codex_plugin_installed",
+                "name": "prompt-polish"
+              }
+            ]
+          },
+          "conflict_policy": "skip"
         },
         "cursor": {
-          "method": "unsupported",
-          "coverage": "unsupported",
+          "method": "git-symlink",
+          "coverage": "native",
           "platforms": [
             "darwin",
             "linux",
             "wsl",
             "windows"
           ],
-          "requires": [],
+          "requires": [
+            "git"
+          ],
+          "args": {
+            "repo": "https://github.com/host452b/prompt-polish.git",
+            "clone_dest": "${HOME}/.agent-setup/repos/prompt-polish",
+            "link": "${HOME}/.cursor/skills/prompt-polish"
+          },
           "safety": {
             "risk": "low",
-            "network": false,
+            "network": true,
             "executes_remote_code": false,
             "requires_admin": false,
             "requires_confirmation": false
           },
-          "manual": {
-            "reason": "prompt-polish is a Claude Code plugin only; no Cursor support"
-          }
+          "checks": {
+            "after": [
+              {
+                "type": "dir_exists",
+                "path": "${HOME}/.cursor/skills/prompt-polish"
+              }
+            ]
+          },
+          "conflict_policy": "skip"
         }
       }
     }

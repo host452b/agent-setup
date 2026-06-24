@@ -59,7 +59,7 @@ Requires `jq` (the installer prints an install hint if it's missing).
 | taste-skill | ✅ auto ² | ✅ auto ² | ✅ auto ² |
 | ui-ux-pro-max | ✅ native | ✅ native | ✅ native |
 | open-design | 📋 manual | 📋 manual | 📋 manual |
-| prompt-polish | ✅ native | N/A | N/A |
+| prompt-polish | ✅ native | ⚠️ partial | ✅ native |
 
 `native` = fully scripted · `partial` = scripted with a trust/interactive step · `manual` = the installer prints exact steps (no CLI exists) · `N/A` = the tool itself has no support for that agent (reported as N/A, not a failure).
 

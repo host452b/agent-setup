@@ -24,6 +24,10 @@ method_plan() { # <entry_json>
     npx-skills)
       printf 'npx -y skills add %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.extra')"
       ;;
+    git-symlink)
+      printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.clone_dest')"
+      printf 'ln -sfn %s %s\n' "$(_arg "$e" '.args.clone_dest')" "$(_arg "$e" '.args.link')"
+      ;;
     git-setup)
       printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.dest')"
       printf 'cd %s && ./setup %s\n' "$(_arg "$e" '.args.dest')" "$(_arg "$e" '.args.setup_args')"
