@@ -19,7 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
 ```
 
-`jq` is required. On a fresh machine, either install it first (`brew install jq` / `apt-get install -y jq`) or add `--install-prereqs`.
+Prerequisites (`jq`, `git`, `node`, `bun`) are **auto-installed by default** before anything else — `bun` via its user-level installer (no sudo), the rest via your package manager. Pass `--skip-prereqs` to manage them yourself. (`jq` is still required to parse the manifest; on a locked-down box without it, install `jq` first.)
 
 **Each step shows a 3-second countdown then auto-confirms (yes)** — press `n` within the window to decline that step. Pass `--yes` to skip the countdown entirely, or `--non-interactive` to decline every privileged step (CI-safe). Use `--dry-run` to review first. Agent installers run unattended (e.g. `CODEX_NON_INTERACTIVE=1`) so they don't block on their own prompts.
 
@@ -76,7 +76,7 @@ bash install.sh [flags]
   --dry-run | --plan     print the resolved plan, change nothing
   --status               show what is already installed
   --check-prereqs        report tool presence (jq, git, node, bun, agents)
-  --install-prereqs      install missing prerequisites via brew/apt/winget
+  --skip-prereqs         do NOT auto-install prerequisites (default: auto-install)
   --agent <name>         scope to one agent: claude | codex | cursor
   --plugin <name>        scope to one plugin
   --only-method <type>   scope to one method type

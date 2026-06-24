@@ -54,7 +54,8 @@ _exec_entry() {
     git-setup)
       local repo dest sa; repo="$(_arg "$e" '.args.repo')"; dest="$(_expand "$(_arg "$e" '.args.dest')")"; sa="$(_arg "$e" '.args.setup_args')"
       [ -d "$dest/.git" ] || git clone --depth 1 "$repo" "$dest"
-      ( cd "$dest" && ./setup $sa ) ;;
+      # gstack's setup bootstraps bun into ~/.bun/bin — make sure it's on PATH
+      ( export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"; cd "$dest" && ./setup $sa ) ;;
     npm-cli)
       local ensure; ensure="$(_arg "$e" '.args.ensure')"
       if [ -n "$ensure" ] && ! tool_present "$ensure"; then sh -c "$(_arg "$e" '.args.ensure_install')" || return 1; fi
@@ -74,7 +75,7 @@ _exec_entry() {
 }
 
 MODE="install"          # install | dry-run | plan | status | check-prereqs
-DO_INSTALL_PREREQS=0
+DO_INSTALL_PREREQS=1     # default: auto-install missing prerequisites (jq/git/node/bun)
 F_AGENT=""; F_PLUGIN=""; F_METHOD=""
 AGENTS_ONLY=0; ASSUME_YES=0; NON_INTERACTIVE=0   # default: 3s countdown then auto-yes
 
@@ -86,6 +87,7 @@ while [ "$#" -gt 0 ]; do
     --status)           MODE="status" ;;
     --check-prereqs)    MODE="check-prereqs" ;;
     --install-prereqs)  DO_INSTALL_PREREQS=1 ;;
+    --skip-prereqs)     DO_INSTALL_PREREQS=0 ;;
     --agent)            F_AGENT="$2"; shift ;;
     --plugin)           F_PLUGIN="$2"; shift ;;
     --only-method)      F_METHOD="$2"; shift ;;
@@ -101,8 +103,8 @@ done
 # 1. detect OS  (overridable for tests)
 OS="${AGENT_SETUP_FORCE_OS:-$(detect_os)}"
 
-# 1b. install prereqs if requested
-if [ "$DO_INSTALL_PREREQS" = "1" ]; then
+# 1b. auto-install missing prerequisites (install mode only — never during dry-run/status/check)
+if [ "$DO_INSTALL_PREREQS" = "1" ] && [ "$MODE" = "install" ]; then
   prereqs_install jq git node bun
 fi
 

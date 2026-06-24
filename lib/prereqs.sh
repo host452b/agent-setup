@@ -24,13 +24,24 @@ prereqs_report() { # <name...>
   done
 }
 
-prereqs_install() { # <name...> — install any missing tools via the platform hint; returns 0 if all present/installed
+prereqs_install() { # <name...> — install any missing tools; returns 0 if all present/installed
   local t rc=0
   for t in "$@"; do
     if tool_present "$t"; then continue; fi
-    local hint; hint="$(prereq_install_hint "$t")"
-    echo "installing prerequisite: $t  ->  $hint" >&2
-    sh -c "$hint" || { echo "failed to install $t" >&2; rc=1; }
+    case "$t" in
+      bun)
+        echo "installing bun (user-level, no sudo)..." >&2
+        local tb; tb="$(mktemp)"
+        if curl -fsSL https://bun.sh/install -o "$tb"; then bash "$tb" </dev/null || rc=1; else rc=1; fi
+        rm -f "$tb"
+        export PATH="$HOME/.bun/bin:$PATH"   # available to the rest of this run
+        ;;
+      *)
+        local hint; hint="$(prereq_install_hint "$t")"
+        echo "installing $t  ->  $hint" >&2
+        sh -c "$hint" </dev/null || { echo "could not auto-install $t (run: $hint)" >&2; rc=1; }
+        ;;
+    esac
   done
   return $rc
 }

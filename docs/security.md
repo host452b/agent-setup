@@ -14,6 +14,10 @@
 - **Least privilege.** The whole script is never run under sudo; only the
   specific subcommands that need elevation request it, and they are surfaced
   in the plan up front.
+- **Auto-prereqs.** Missing `jq`/`git`/`node`/`bun` are installed by default
+  before the run (`bun` user-level via `bun.sh/install`; others via the package
+  manager, root-aware). Disable with `--skip-prereqs`. Only happens in install
+  mode — never during `--dry-run`/`--status`/`--check-prereqs`.
 - **Global installs** (e.g. `npm install -g uipro-cli`) may mutate PATH
   depending on your npm prefix; targets that need them declare it in the
   manifest, and project-scoped CLIs are run from `$HOME` so their output
