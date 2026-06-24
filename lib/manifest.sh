@@ -20,6 +20,7 @@ manifest_validate() { # <file>
 
 manifest_resolve_plan() { # <file> <os> <agents_json>
   local f="$1" os="$2" agents="$3"
+  [ -f "$f" ] || { echo "manifest_resolve_plan: no such file: $f" >&2; return 1; }
   jq --arg os "$os" --argjson agents "$agents" '
     [ .plugins | to_entries[] as $p
       | ($p.value.targets | to_entries[]) as $t
