@@ -22,7 +22,7 @@ method_plan() { # <entry_json>
       printf 'download-then-run %s\n' "$(_arg "$e" '.args.url_unix')"
       ;;
     npx-skills)
-      printf 'npx -y skills add %s\n' "$(_arg "$e" '.args.repo')"
+      printf 'npx -y skills add %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.extra')"
       ;;
     git-setup)
       printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.dest')"

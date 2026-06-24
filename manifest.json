@@ -329,7 +329,8 @@
             "node"
           ],
           "args": {
-            "repo": "https://github.com/Leonxlnx/taste-skill"
+            "repo": "https://github.com/Leonxlnx/taste-skill",
+            "extra": "--skill '*' --yes -a claude"
           },
           "safety": {
             "risk": "medium",

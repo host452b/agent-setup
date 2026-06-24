@@ -52,7 +52,8 @@ _exec_entry() {
     shell-installer)
       local tmp; tmp="$(mktemp)"; curl -fsSL "$(_arg "$e" '.args.url_unix')" -o "$tmp" && bash "$tmp"; rm -f "$tmp" ;;
     npx-skills)
-      npx -y skills add "$(_arg "$e" '.args.repo')" ;;
+      # run via sh -c so quoted globs like --skill '*' stay literal (no filename expansion)
+      sh -c "npx -y skills add '$(_arg "$e" '.args.repo')' $(_arg "$e" '.args.extra')" ;;
     git-setup)
       local repo dest sa; repo="$(_arg "$e" '.args.repo')"; dest="$(_expand "$(_arg "$e" '.args.dest')")"; sa="$(_arg "$e" '.args.setup_args')"
       [ -d "$dest/.git" ] || git clone --depth 1 "$repo" "$dest"
