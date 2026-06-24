@@ -33,10 +33,10 @@ bootstrap_fetch() { # <cache> <method>
       ;;
     tarball)
       local tmp; tmp="$(mktemp)"
-      curl -fsSL "$tarball" -o "$tmp" || { echo "agent-setup: download failed" >&2; rm -f "$tmp"; return 1; }
+      trap 'rm -f "$tmp"' RETURN
+      curl -fsSL "$tarball" -o "$tmp" || { echo "agent-setup: download failed" >&2; return 1; }
       rm -rf "$cache"; mkdir -p "$cache"
       tar xzf "$tmp" -C "$cache" --strip-components=1
-      rm -f "$tmp"
       ;;
     *) echo "agent-setup: unknown fetch method: $method" >&2; return 1 ;;
   esac
