@@ -42,10 +42,12 @@ _exec_entry() {
       claude plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" \
       && claude plugin install "$(_arg "$e" '.args.plugin')@$(_arg "$e" '.args.marketplace_name')" ;;
     codex-plugin)
-      local cp_plugin; cp_plugin="$(_arg "$e" '.args.plugin')"
+      local cp_plugin cp_mkt cp_spec
+      cp_plugin="$(_arg "$e" '.args.plugin')"; cp_mkt="$(_arg "$e" '.args.marketplace_name')"
+      cp_spec="$cp_plugin"; [ -n "$cp_mkt" ] && cp_spec="$cp_plugin@$cp_mkt"
       codex plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" >/dev/null 2>&1 || true
-      if codex plugin add "$cp_plugin" 2>/dev/null; then return 0; fi
-      echo "  codex 'plugin add' unsupported by this codex version — upgrade codex (npm i -g @openai/codex) or install '$cp_plugin' via codex's /plugins UI" >&2
+      if codex plugin add "$cp_spec"; then return 0; fi
+      echo "  codex plugin add '$cp_spec' failed — install '$cp_plugin' via codex's /plugins UI, or upgrade codex" >&2
       return 3 ;;
     shell-installer)
       local tmp; tmp="$(mktemp)"; curl -fsSL "$(_arg "$e" '.args.url_unix')" -o "$tmp" && bash "$tmp"; rm -f "$tmp" ;;

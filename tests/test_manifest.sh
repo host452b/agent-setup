@@ -15,8 +15,8 @@ plan="$(manifest_resolve_plan "$root/manifest.json" darwin "$agents")"
 assert_eq "1" "$(echo "$plan" | jq '[.[]|select(.plugin=="superpowers" and .agent=="claude")]|length')" "sp claude present"
 # codex absent -> no codex entries
 assert_eq "0" "$(echo "$plan" | jq '[.[]|select(.agent=="codex")]|length')" "no codex when absent"
-# cursor present -> gstack/cursor present, method git-setup
-assert_eq "git-setup" "$(echo "$plan" | jq -r '.[]|select(.plugin=="gstack" and .agent=="cursor")|.method')" "gstack cursor method"
+# cursor present -> ui-ux-pro-max/cursor present, method npm-cli
+assert_eq "npm-cli" "$(echo "$plan" | jq -r '.[]|select(.plugin=="ui-ux-pro-max" and .agent=="cursor")|.method')" "ui-ux cursor method"
 # every entry carries coverage
 assert_eq "0" "$(echo "$plan" | jq '[.[]|select(.coverage==null)]|length')" "all have coverage"
 assert_fail manifest_resolve_plan "$root/nonexistent-manifest-xyz.json" darwin "$agents"

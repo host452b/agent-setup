@@ -13,8 +13,10 @@ method_plan() { # <entry_json>
       printf 'claude plugin install %s@%s\n' "$(_arg "$e" '.args.plugin')" "$(_arg "$e" '.args.marketplace_name')"
       ;;
     codex-plugin)
+      local cp_spec; cp_spec="$(_arg "$e" '.args.plugin')"
+      [ -n "$(_arg "$e" '.args.marketplace_name')" ] && cp_spec="$cp_spec@$(_arg "$e" '.args.marketplace_name')"
       printf 'codex plugin marketplace add %s\n' "$(_arg "$e" '.args.marketplace_src')"
-      printf 'codex plugin add %s\n' "$(_arg "$e" '.args.plugin')"
+      printf 'codex plugin add %s\n' "$cp_spec"
       ;;
     shell-installer)
       printf 'download-then-run %s\n' "$(_arg "$e" '.args.url_unix')"

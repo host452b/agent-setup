@@ -54,7 +54,7 @@ Requires `jq` (the installer prints an install hint if it's missing).
 |---|---|---|---|
 | superpowers | ✅ native | ⚠️ partial | 📋 manual |
 | ponytail | ✅ native | ⚠️ partial | 📋 manual |
-| gstack | ✅ native | ✅ native | ✅ native |
+| gstack | ✅ native | ✅ native | — ³ |
 | caveman | ✅ auto ¹ | ✅ auto ¹ | ✅ auto ¹ |
 | taste-skill | ✅ auto ² | ✅ auto ² | ✅ auto ² |
 | ui-ux-pro-max | ✅ native | ✅ native | ✅ native |
@@ -65,6 +65,7 @@ Requires `jq` (the installer prints an install hint if it's missing).
 
 ¹ caveman runs one installer (`curl … | bash`) that auto-detects and configures every supported agent present.
 ² taste-skill installs via `npx skills add`, which lands in the detected agents' skills directories.
+³ gstack's installer has no Cursor host (supports claude/codex/kiro/factory/opencode/openclaw/hermes/gbrain), so Cursor isn't a gstack target.
 
 **Cursor is a best-effort integration target** — `cursor-agent` has no plugin-install CLI, so coverage comes from each tool's own cross-agent path (skills dir, rules file, MCP, `npx skills`). See [`docs/cursor.md`](docs/cursor.md).
 

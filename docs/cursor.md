@@ -4,10 +4,10 @@
 command**. So Cursor coverage comes from each tool's own cross-agent path,
 not a marketplace install:
 
-- **gstack** — `./setup --host cursor` (installs into Cursor's skills dir)
+- **gstack** — not supported on Cursor (gstack's setup has no Cursor host)
 - **caveman** — its installer auto-detects Cursor
 - **taste-skill** — `npx skills add` targets Cursor's skills dir
-- **ui-ux-pro-max** — `uipro init --ai cursor --global`
+- **ui-ux-pro-max** — `npx uipro init --ai cursor` (lands in `~/.cursor/skills`)
 - **open-design** — `od mcp install cursor`
 - **superpowers / ponytail** — manual: copy the rules file into the Cursor
   rules dir, or use the in-chat `/add-plugin` flow. The installer prints these

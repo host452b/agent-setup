@@ -83,7 +83,8 @@
           "install_scope": "user",
           "args": {
             "marketplace_src": "obra/superpowers",
-            "plugin": "superpowers"
+            "plugin": "superpowers",
+            "marketplace_name": "superpowers-dev"
           },
           "safety": {
             "risk": "medium",
@@ -175,7 +176,8 @@
           ],
           "args": {
             "marketplace_src": "DietrichGebert/ponytail",
-            "plugin": "ponytail"
+            "plugin": "ponytail",
+            "marketplace_name": "ponytail"
           },
           "safety": {
             "risk": "medium",
@@ -272,34 +274,6 @@
             "repo": "https://github.com/garrytan/gstack.git",
             "dest": "${HOME}/.gstack",
             "setup_args": "--host codex"
-          },
-          "safety": {
-            "risk": "medium",
-            "network": true,
-            "executes_remote_code": true,
-            "requires_admin": false,
-            "requires_confirmation": true
-          },
-          "conflict_policy": "skip"
-        },
-        "cursor": {
-          "method": "git-setup",
-          "coverage": "native",
-          "platforms": [
-            "darwin",
-            "linux",
-            "wsl",
-            "windows"
-          ],
-          "requires": [
-            "git",
-            "node",
-            "bun"
-          ],
-          "args": {
-            "repo": "https://github.com/garrytan/gstack.git",
-            "dest": "${HOME}/.gstack",
-            "setup_args": "--host cursor"
           },
           "safety": {
             "risk": "medium",
