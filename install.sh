@@ -209,21 +209,24 @@ done
 # 10. report — concise, grouped, saved to a file
 RUNDIR="${AGENT_SETUP_HOME:-$HOME/.agent-setup}"; mkdir -p "$RUNDIR"
 REPORT_FILE="$RUNDIR/last-install-report.txt"
-print_group() { # <key> <heading> <symbol>
+C_GREEN=$'\033[32m'; C_YEL=$'\033[33m'; C_CYAN=$'\033[36m'; C_RED=$'\033[31m'; C_OFF=$'\033[0m'
+[ -n "${NO_COLOR:-}" ] && { C_GREEN=""; C_YEL=""; C_CYAN=""; C_RED=""; C_OFF=""; }
+print_group() { # <key> <heading> <symbol> <color>
   local cnt; cnt="$(awk -F'\t' -v k="$1" '$1==k' "$REPORT" | wc -l | tr -d ' ')"
   [ "$cnt" = 0 ] && return 0
-  printf '\n%s (%s):\n' "$2" "$cnt"
-  awk -F'\t' -v k="$1" -v s="$3" '$1==k {printf "  %s %-22s %s\n", s, $2, $3}' "$REPORT"
+  printf '\n%s%s (%s):%s\n' "$4" "$2" "$cnt" "$C_OFF"
+  awk -F'\t' -v k="$1" -v s="$3" -v c="$4" -v o="$C_OFF" '$1==k {printf "  %s%s %-22s%s %s\n", c, s, $2, o, $3}' "$REPORT"
 }
+STRIP="s/$(printf '\033')\\[[0-9;]*m//g"
 {
   echo "================ agent-setup report ================"
   echo "OS: $OS"
-  print_group ok     "OK"      "+"
-  print_group skip   "SKIPPED" "-"
-  print_group manual "MANUAL"  "*"
-  print_group fail   "FAILED"  "x"
+  print_group ok     "OK"      "+" "$C_GREEN"
+  print_group skip   "SKIPPED" "-" "$C_YEL"
+  print_group manual "MANUAL"  "*" "$C_CYAN"
+  print_group fail   "FAILED"  "x" "$C_RED"
   echo "===================================================="
-} | tee "$REPORT_FILE"
+} | tee >(sed "$STRIP" > "$REPORT_FILE")
 echo "report saved: $REPORT_FILE"
 
 fail_n="$(awk -F'\t' '$1=="fail"' "$REPORT" | wc -l | tr -d ' ')"
