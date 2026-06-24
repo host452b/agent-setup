@@ -19,7 +19,9 @@ curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
 ```
 
-`jq` is required. On a fresh machine, either install it first (`brew install jq` / `apt-get install -y jq`) or add `--install-prereqs`. When run through a pipe with no terminal, high-risk steps are skipped unless you pass `--yes`.
+`jq` is required. On a fresh machine, either install it first (`brew install jq` / `apt-get install -y jq`) or add `--install-prereqs`.
+
+**Confirmation is auto-yes by default**: each step shows a 3-second countdown and proceeds unless you press `n`. Pass `--yes` to skip the countdown entirely, or `--non-interactive` to decline every privileged step (CI-safe).
 
 Prefer to inspect before running (recommended — see [Security](docs/security.md)):
 
@@ -79,8 +81,8 @@ bash install.sh [flags]
   --plugin <name>        scope to one plugin
   --only-method <type>   scope to one method type
   --agents-only          install only the agent binaries (step 1)
-  --yes                  auto-confirm high-risk steps
-  --non-interactive      CI mode; fail on any privileged step
+  --yes                  skip the 3s countdown; confirm everything immediately
+  --non-interactive      decline every privileged step (CI-safe)
 ```
 
 Flags pass through the bootstrap too: `… | bash -s -- --plugin gstack --dry-run`.

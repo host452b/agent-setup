@@ -11,19 +11,25 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib/methods.sh"
 . "$HERE/lib/report.sh"
 
+# pure: interpret a confirm answer. Default (empty) = yes; only n/no declines.
+_confirm_answer() { case "$1" in n|N|no|NO) return 1 ;; *) return 0 ;; esac; }
+
 # confirm <prompt> -> 0 yes / 1 no.
-# Honors --yes; reads from /dev/tty when available; under a pipe with no tty
-# and no --yes, returns no (skip) instead of hanging/misreading the script.
+# Default is YES, auto-confirmed after a 3s countdown unless the user presses n.
+# --yes skips the wait; --non-interactive declines (safe for CI); no terminal
+# auto-confirms (the piped one-liner's default).
 confirm() {
+  [ "$NON_INTERACTIVE" = "1" ] && return 1
   [ "$ASSUME_YES" = "1" ] && return 0
-  if [ -r /dev/tty ]; then
-    printf '%s [y/N] ' "$1" > /dev/tty
-    local a; read -r a < /dev/tty || return 1
-    [ "$a" = "y" ] || [ "$a" = "Y" ]
-  else
-    echo "  (no terminal; re-run with --yes to auto-confirm) — skipping" >&2
-    return 1
-  fi
+  [ -r /dev/tty ] || return 0
+  local a="" s
+  for s in 3 2 1; do
+    printf '\r%s  auto-yes in %ds (press n to decline) ' "$1" "$s" > /dev/tty
+    if read -t 1 -r a < /dev/tty; then break; fi
+    a=""
+  done
+  printf '\n' > /dev/tty
+  _confirm_answer "$a"
 }
 
 # _exec_entry <entry_json> — real side effects per method.
