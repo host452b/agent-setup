@@ -11,13 +11,34 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib/methods.sh"
 . "$HERE/lib/report.sh"
 
-_exec_entry() { # <entry_json> — performs real side effects per method
+# confirm <prompt> -> 0 yes / 1 no.
+# Honors --yes; reads from /dev/tty when available; under a pipe with no tty
+# and no --yes, returns no (skip) instead of hanging/misreading the script.
+confirm() {
+  [ "$ASSUME_YES" = "1" ] && return 0
+  if [ -r /dev/tty ]; then
+    printf '%s [y/N] ' "$1" > /dev/tty
+    local a; read -r a < /dev/tty || return 1
+    [ "$a" = "y" ] || [ "$a" = "Y" ]
+  else
+    echo "  (no terminal; re-run with --yes to auto-confirm) — skipping" >&2
+    return 1
+  fi
+}
+
+# _exec_entry <entry_json> — real side effects per method.
+# Returns: 0 success · 3 skipped/not-applicable · other = failure.
+_exec_entry() {
   local e="$1" m; m="$(jq -r '.method' <<<"$e")"
   case "$m" in
     claude-plugin)
       claude plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" \
       && claude plugin install "$(_arg "$e" '.args.plugin')@$(_arg "$e" '.args.marketplace_name')" ;;
     codex-plugin)
+      if ! codex plugin add --help >/dev/null 2>&1; then
+        echo "  codex 'plugin add' is unsupported by this codex version — upgrade codex, or install '$(_arg "$e" '.args.plugin')' via codex's /plugins UI. Skipping." >&2
+        return 3
+      fi
       codex plugin marketplace add "$(_arg "$e" '.args.marketplace_src')" \
       && codex plugin add "$(_arg "$e" '.args.plugin')" ;;
     shell-installer)
@@ -25,17 +46,23 @@ _exec_entry() { # <entry_json> — performs real side effects per method
     npx-skills)
       npx -y skills add "$(_arg "$e" '.args.repo')" ;;
     git-setup)
-      local repo dest sa; repo="$(_arg "$e" '.args.repo')"; dest="$(eval echo "$(_arg "$e" '.args.dest')")"; sa="$(_arg "$e" '.args.setup_args')"
+      local repo dest sa; repo="$(_arg "$e" '.args.repo')"; dest="$(_expand "$(_arg "$e" '.args.dest')")"; sa="$(_arg "$e" '.args.setup_args')"
       [ -d "$dest/.git" ] || git clone --depth 1 "$repo" "$dest"
       ( cd "$dest" && ./setup $sa ) ;;
     npm-cli)
       local ensure; ensure="$(_arg "$e" '.args.ensure')"
-      if [ -n "$ensure" ] && ! tool_present "$ensure"; then sh -c "$(_arg "$e" '.args.ensure_install')"; fi
-      sh -c "$(_arg "$e" '.args.command')" ;;
+      if [ -n "$ensure" ] && ! tool_present "$ensure"; then sh -c "$(_arg "$e" '.args.ensure_install')" || return 1; fi
+      # run from $HOME so a project-scoped CLI lands in the user's home dirs
+      ( cd "$HOME" && sh -c "$(_arg "$e" '.args.command')" ) ;;
     od-mcp)
       local odp; odp="$(tool_realpath od)"
-      case "$odp" in *"$(_arg "$e" '.args.expected_substr')"*) od mcp install "$(_arg "$e" '.args.agent')" ;;
-        *) echo "od PATH-shadowed ($odp) — open-design not installed; see docs" >&2; return 1 ;; esac ;;
+      if [ -z "$odp" ]; then
+        echo "  open-design: 'od' not installed — skipping (install open-design first; see docs)" >&2; return 3
+      fi
+      case "$odp" in
+        *"$(_arg "$e" '.args.expected_substr')"*) od mcp install "$(_arg "$e" '.args.agent')" ;;
+        *) echo "  open-design: 'od' resolves to $odp (shadowed, not open-design) — skipping" >&2; return 3 ;;
+      esac ;;
     *) echo "no executor for method: $m" >&2; return 1 ;;
   esac
 }
@@ -127,26 +154,40 @@ if [ -z "$F_PLUGIN" ] && [ -z "$F_METHOD" ]; then
     if tool_present "$bin"; then echo "agent $a present ($(tool_realpath "$bin"))"; continue; fi
     url="$(jq -r --arg a "$a" --arg os "$OS" '.agents[$a].install[$os]' "$MANIFEST")"
     echo "installing agent $a from $url"
-    [ "$ASSUME_YES" = "1" ] || { printf 'proceed? [y/N] '; read -r ans; [ "$ans" = "y" ] || continue; }
+    confirm "  proceed?" || { echo "agent $a skipped"; continue; }
     tmp="$(mktemp)"; curl -fsSL "$url" -o "$tmp" && bash "$tmp"; rm -f "$tmp"
   done
 fi
 [ "$AGENTS_ONLY" = "1" ] && exit 0
 
 # 9. execute plan entries
+S_OK=""; S_SKIP=""; S_MANUAL=""; S_FAIL=""
 n="$(jq 'length' <<<"$PLAN")"; i=0
 while [ "$i" -lt "$n" ]; do
   e="$(jq -c ".[$i]" <<<"$PLAN")"; i=$((i + 1))
   label="$(jq -r '.plugin' <<<"$e")/$(jq -r '.agent' <<<"$e")"
-  if checks_has_after "$e" && checks_run_after "$e"; then echo "[$label] already satisfied — skip"; continue; fi
+  if checks_has_after "$e" && checks_run_after "$e"; then echo "[$label] already satisfied — skip"; S_OK="$S_OK $label"; continue; fi
   if [ "$(jq -r '.method' <<<"$e")" = "manual" ]; then
-    echo "[$label] MANUAL:"; report_manual_steps "$e"; continue
+    echo "[$label] MANUAL:"; report_manual_steps "$e"; S_MANUAL="$S_MANUAL $label"; continue
   fi
   hi="$(jq -r '(.safety.executes_remote_code // false) or (.safety.requires_admin // false)' <<<"$e")"
-  if [ "$hi" = "true" ] && [ "$ASSUME_YES" != "1" ]; then
+  if [ "$hi" = "true" ]; then
     echo "[$label] high-risk:"; method_plan "$e" | sed 's/^/    $ /'
-    printf 'proceed? [y/N] '; read -r ans; [ "$ans" = "y" ] || { echo "[$label] skipped"; continue; }
+    confirm "[$label] proceed?" || { echo "[$label] skipped"; S_SKIP="$S_SKIP $label"; continue; }
   fi
   echo "[$label] executing:"; method_plan "$e" | sed 's/^/    $ /'
-  _exec_entry "$e" || echo "[$label] FAILED" >&2
+  _exec_entry "$e"; rc=$?
+  case "$rc" in
+    0) S_OK="$S_OK $label" ;;
+    3) echo "[$label] skipped"; S_SKIP="$S_SKIP $label" ;;
+    *) echo "[$label] FAILED" >&2; S_FAIL="$S_FAIL $label" ;;
+  esac
 done
+
+echo ""
+echo "=== summary ==="
+echo "ok:     ${S_OK:- (none)}"
+echo "skipped:${S_SKIP:- (none)}"
+echo "manual: ${S_MANUAL:- (none)}"
+echo "failed: ${S_FAIL:- (none)}"
+[ -z "$S_FAIL" ]

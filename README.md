@@ -12,9 +12,14 @@ It installs three agents — **Claude Code**, **Codex CLI**, **Cursor CLI** — 
 # macOS / Linux / WSL / Git-Bash (Windows)
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash
 
+# unattended (auto-confirm high-risk steps; needed for the piped one-liner)
+curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --yes
+
 # preview the full plan without changing anything
 curl -fsSL https://raw.githubusercontent.com/host452b/agent-setup/main/bootstrap.sh | bash -s -- --dry-run
 ```
+
+`jq` is required. On a fresh machine, either install it first (`brew install jq` / `apt-get install -y jq`) or add `--install-prereqs`. When run through a pipe with no terminal, high-risk steps are skipped unless you pass `--yes`.
 
 Prefer to inspect before running (recommended — see [Security](docs/security.md)):
 

@@ -5,27 +5,27 @@
       "binary": "claude",
       "install": {
         "darwin": "https://claude.ai/install.sh",
-        "linux":  "https://claude.ai/install.sh",
-        "wsl":    "https://claude.ai/install.sh",
-        "windows":"https://claude.ai/install.sh"
+        "linux": "https://claude.ai/install.sh",
+        "wsl": "https://claude.ai/install.sh",
+        "windows": "https://claude.ai/install.sh"
       }
     },
     "codex": {
       "binary": "codex",
       "install": {
         "darwin": "https://chatgpt.com/codex/install.sh",
-        "linux":  "https://chatgpt.com/codex/install.sh",
-        "wsl":    "https://chatgpt.com/codex/install.sh",
-        "windows":"https://chatgpt.com/codex/install.sh"
+        "linux": "https://chatgpt.com/codex/install.sh",
+        "wsl": "https://chatgpt.com/codex/install.sh",
+        "windows": "https://chatgpt.com/codex/install.sh"
       }
     },
     "cursor": {
       "binary": "cursor-agent",
       "install": {
         "darwin": "https://cursor.com/install",
-        "linux":  "https://cursor.com/install",
-        "wsl":    "https://cursor.com/install",
-        "windows":"https://cursor.com/install"
+        "linux": "https://cursor.com/install",
+        "wsl": "https://cursor.com/install",
+        "windows": "https://cursor.com/install"
       }
     }
   },
@@ -33,30 +33,93 @@
     "superpowers": {
       "targets": {
         "claude": {
-          "method": "claude-plugin", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["claude","jq"],
+          "method": "claude-plugin",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "claude",
+            "jq"
+          ],
           "install_scope": "user",
-          "args": { "marketplace_src": "obra/superpowers-marketplace", "marketplace_name": "superpowers-marketplace", "plugin": "superpowers" },
-          "safety": { "risk": "low", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
-          "checks": { "after": [ { "type": "claude_plugin_installed", "name": "superpowers" } ] },
+          "args": {
+            "marketplace_src": "obra/superpowers-marketplace",
+            "marketplace_name": "superpowers-marketplace",
+            "plugin": "superpowers"
+          },
+          "safety": {
+            "risk": "low",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "claude_plugin_installed",
+                "name": "superpowers"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         },
         "codex": {
-          "method": "codex-plugin", "coverage": "partial",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["codex"],
+          "method": "codex-plugin",
+          "coverage": "partial",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "codex"
+          ],
           "install_scope": "user",
-          "args": { "marketplace_src": "obra/superpowers", "plugin": "superpowers" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true },
+          "args": {
+            "marketplace_src": "obra/superpowers",
+            "plugin": "superpowers"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         },
         "cursor": {
-          "method": "manual", "coverage": "manual",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": [],
-          "safety": { "risk": "low", "network": false, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
+          "method": "manual",
+          "coverage": "manual",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [],
+          "safety": {
+            "risk": "low",
+            "network": false,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
           "manual": {
             "reason": "Cursor installs superpowers via the in-chat /add-plugin marketplace; no CLI exists.",
-            "steps": ["Open a Cursor Agent chat", "Run: /add-plugin superpowers"],
-            "verification": ["Ask Cursor to list installed plugins and confirm superpowers appears"]
+            "steps": [
+              "Open a Cursor Agent chat",
+              "Run: /add-plugin superpowers"
+            ],
+            "verification": [
+              "Ask Cursor to list installed plugins and confirm superpowers appears"
+            ]
           }
         }
       }
@@ -64,28 +127,91 @@
     "ponytail": {
       "targets": {
         "claude": {
-          "method": "claude-plugin", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["claude","jq"],
-          "args": { "marketplace_src": "DietrichGebert/ponytail", "marketplace_name": "ponytail", "plugin": "ponytail" },
-          "safety": { "risk": "low", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
-          "checks": { "after": [ { "type": "claude_plugin_installed", "name": "ponytail" } ] },
+          "method": "claude-plugin",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "claude",
+            "jq"
+          ],
+          "args": {
+            "marketplace_src": "DietrichGebert/ponytail",
+            "marketplace_name": "ponytail",
+            "plugin": "ponytail"
+          },
+          "safety": {
+            "risk": "low",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "claude_plugin_installed",
+                "name": "ponytail"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         },
         "codex": {
-          "method": "codex-plugin", "coverage": "partial",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["codex"],
-          "args": { "marketplace_src": "DietrichGebert/ponytail", "plugin": "ponytail" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true },
+          "method": "codex-plugin",
+          "coverage": "partial",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "codex"
+          ],
+          "args": {
+            "marketplace_src": "DietrichGebert/ponytail",
+            "plugin": "ponytail"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         },
         "cursor": {
-          "method": "manual", "coverage": "manual",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": [],
-          "safety": { "risk": "low", "network": false, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
+          "method": "manual",
+          "coverage": "manual",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [],
+          "safety": {
+            "risk": "low",
+            "network": false,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
           "manual": {
             "reason": "Ponytail is instruction-only on Cursor: copy its rules file into the Cursor rules dir.",
-            "steps": ["Clone https://github.com/DietrichGebert/ponytail", "Copy .cursor/rules/ponytail.md into your Cursor rules directory (see docs/cursor.md)"],
-            "verification": ["Confirm ponytail.md exists in the Cursor rules directory"]
+            "steps": [
+              "Clone https://github.com/DietrichGebert/ponytail",
+              "Copy .cursor/rules/ponytail.md into your Cursor rules directory (see docs/cursor.md)"
+            ],
+            "verification": [
+              "Confirm ponytail.md exists in the Cursor rules directory"
+            ]
           }
         }
       }
@@ -93,25 +219,95 @@
     "gstack": {
       "targets": {
         "claude": {
-          "method": "git-setup", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["git","node","bun"],
-          "args": { "repo": "https://github.com/garrytan/gstack.git", "dest": "${HOME}/.claude/skills/gstack", "setup_args": "" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": true, "requires_admin": false, "requires_confirmation": true },
-          "checks": { "after": [ { "type": "dir_exists", "path": "${HOME}/.claude/skills/gstack" } ] },
+          "method": "git-setup",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "git",
+            "node",
+            "bun"
+          ],
+          "args": {
+            "repo": "https://github.com/garrytan/gstack.git",
+            "dest": "${HOME}/.claude/skills/gstack",
+            "setup_args": ""
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": true,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "dir_exists",
+                "path": "${HOME}/.claude/skills/gstack"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         },
         "codex": {
-          "method": "git-setup", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["git","node","bun"],
-          "args": { "repo": "https://github.com/garrytan/gstack.git", "dest": "${HOME}/.gstack", "setup_args": "--host codex" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": true, "requires_admin": false, "requires_confirmation": true },
+          "method": "git-setup",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "git",
+            "node",
+            "bun"
+          ],
+          "args": {
+            "repo": "https://github.com/garrytan/gstack.git",
+            "dest": "${HOME}/.gstack",
+            "setup_args": "--host codex"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": true,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         },
         "cursor": {
-          "method": "git-setup", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["git","node","bun"],
-          "args": { "repo": "https://github.com/garrytan/gstack.git", "dest": "${HOME}/.gstack", "setup_args": "--host cursor" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": true, "requires_admin": false, "requires_confirmation": true },
+          "method": "git-setup",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "git",
+            "node",
+            "bun"
+          ],
+          "args": {
+            "repo": "https://github.com/garrytan/gstack.git",
+            "dest": "${HOME}/.gstack",
+            "setup_args": "--host cursor"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": true,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         }
       }
@@ -119,10 +315,27 @@
     "caveman": {
       "targets": {
         "claude": {
-          "method": "shell-installer", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["node"],
-          "args": { "url_unix": "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh" },
-          "safety": { "risk": "high", "network": true, "executes_remote_code": true, "requires_admin": false, "requires_confirmation": true },
+          "method": "shell-installer",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "node"
+          ],
+          "args": {
+            "url_unix": "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh"
+          },
+          "safety": {
+            "risk": "high",
+            "network": true,
+            "executes_remote_code": true,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         }
       }
@@ -130,10 +343,27 @@
     "taste-skill": {
       "targets": {
         "claude": {
-          "method": "npx-skills", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["node"],
-          "args": { "repo": "https://github.com/Leonxlnx/taste-skill" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": true, "requires_admin": false, "requires_confirmation": true },
+          "method": "npx-skills",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "node"
+          ],
+          "args": {
+            "repo": "https://github.com/Leonxlnx/taste-skill"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": true,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "skip"
         }
       }
@@ -141,28 +371,106 @@
     "ui-ux-pro-max": {
       "targets": {
         "claude": {
-          "method": "npm-cli", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["node"],
-          "install_scope": "global", "requires_path_mutation": true,
-          "args": { "ensure": "uipro", "ensure_install": "npm install -g uipro-cli", "command": "uipro init --ai claude --global" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true, "writes_global_config": true },
-          "checks": { "after": [ { "type": "command_exists", "name": "uipro" } ] },
+          "method": "claude-plugin",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "claude",
+            "jq"
+          ],
+          "args": {
+            "marketplace_src": "nextlevelbuilder/ui-ux-pro-max-skill",
+            "marketplace_name": "ui-ux-pro-max-skill",
+            "plugin": "ui-ux-pro-max"
+          },
+          "safety": {
+            "risk": "low",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "claude_plugin_installed",
+                "name": "ui-ux-pro-max"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         },
         "codex": {
-          "method": "npm-cli", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["node"],
-          "install_scope": "global", "requires_path_mutation": true,
-          "args": { "ensure": "uipro", "ensure_install": "npm install -g uipro-cli", "command": "uipro init --ai codex --global" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true, "writes_global_config": true },
+          "method": "npm-cli",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "node"
+          ],
+          "args": {
+            "ensure": "uipro",
+            "ensure_install": "npm install -g uipro-cli",
+            "command": "uipro init --ai codex"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "command_exists",
+                "name": "uipro"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         },
         "cursor": {
-          "method": "npm-cli", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["node"],
-          "install_scope": "global", "requires_path_mutation": true,
-          "args": { "ensure": "uipro", "ensure_install": "npm install -g uipro-cli", "command": "uipro init --ai cursor --global" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true, "writes_global_config": true },
+          "method": "npm-cli",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "node"
+          ],
+          "args": {
+            "ensure": "uipro",
+            "ensure_install": "npm install -g uipro-cli",
+            "command": "uipro init --ai cursor"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "command_exists",
+                "name": "uipro"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         }
       }
@@ -170,24 +478,78 @@
     "open-design": {
       "targets": {
         "claude": {
-          "method": "od-mcp", "coverage": "partial",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["od"],
-          "args": { "agent": "claude", "expected_substr": "open-design" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true },
+          "method": "od-mcp",
+          "coverage": "partial",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "od"
+          ],
+          "args": {
+            "agent": "claude",
+            "expected_substr": "open-design"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "merge"
         },
         "codex": {
-          "method": "od-mcp", "coverage": "partial",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["od"],
-          "args": { "agent": "codex", "expected_substr": "open-design" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true },
+          "method": "od-mcp",
+          "coverage": "partial",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "od"
+          ],
+          "args": {
+            "agent": "codex",
+            "expected_substr": "open-design"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "merge"
         },
         "cursor": {
-          "method": "od-mcp", "coverage": "partial",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["od"],
-          "args": { "agent": "cursor", "expected_substr": "open-design" },
-          "safety": { "risk": "medium", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": true },
+          "method": "od-mcp",
+          "coverage": "partial",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "od"
+          ],
+          "args": {
+            "agent": "cursor",
+            "expected_substr": "open-design"
+          },
+          "safety": {
+            "risk": "medium",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": true
+          },
           "conflict_policy": "merge"
         }
       }
@@ -195,11 +557,38 @@
     "prompt-polish": {
       "targets": {
         "claude": {
-          "method": "claude-plugin", "coverage": "native",
-          "platforms": ["darwin","linux","wsl","windows"], "requires": ["claude","jq"],
-          "args": { "marketplace_src": "host452b/prompt-polish", "marketplace_name": "prompt-polish", "plugin": "prompt-polish" },
-          "safety": { "risk": "low", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
-          "checks": { "after": [ { "type": "claude_plugin_installed", "name": "prompt-polish" } ] },
+          "method": "claude-plugin",
+          "coverage": "native",
+          "platforms": [
+            "darwin",
+            "linux",
+            "wsl",
+            "windows"
+          ],
+          "requires": [
+            "claude",
+            "jq"
+          ],
+          "args": {
+            "marketplace_src": "host452b/prompt-polish",
+            "marketplace_name": "prompt-polish",
+            "plugin": "prompt-polish"
+          },
+          "safety": {
+            "risk": "low",
+            "network": true,
+            "executes_remote_code": false,
+            "requires_admin": false,
+            "requires_confirmation": false
+          },
+          "checks": {
+            "after": [
+              {
+                "type": "claude_plugin_installed",
+                "name": "prompt-polish"
+              }
+            ]
+          },
           "conflict_policy": "skip"
         }
       }
