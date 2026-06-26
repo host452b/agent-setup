@@ -25,8 +25,13 @@ method_plan() { # <entry_json>
       printf 'npx -y skills add %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.extra')"
       ;;
     git-symlink)
-      printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.clone_dest')"
-      printf 'ln -sfn %s %s\n' "$(_arg "$e" '.args.clone_dest')" "$(_arg "$e" '.args.link')"
+      local clone_dest link_src link_subpath
+      clone_dest="$(_arg "$e" '.args.clone_dest')"
+      link_subpath="$(_arg "$e" '.args.link_subpath')"
+      link_src="$clone_dest"
+      [ -n "$link_subpath" ] && link_src="${clone_dest%/}/${link_subpath#/}"
+      printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$clone_dest"
+      printf 'ln -sfn %s %s\n' "$link_src" "$(_arg "$e" '.args.link')"
       ;;
     git-setup)
       printf 'git clone --depth 1 %s %s\n' "$(_arg "$e" '.args.repo')" "$(_arg "$e" '.args.dest')"

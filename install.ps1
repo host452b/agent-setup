@@ -29,6 +29,11 @@ function Expand-Home([string]$s) {
   return $s
 }
 
+function Join-ManifestSubpath([string]$base, [string]$subpath) {
+  if ([string]::IsNullOrWhiteSpace($subpath)) { return $base }
+  return (($base -replace '/+$', '') + '/' + ($subpath -replace '^/+', ''))
+}
+
 # --- Cursor (cursor-agent CLI) paths: ~/.cursor on every OS ---
 function Get-CursorUserDir { Join-Path $HOME '.cursor' }
 
@@ -139,7 +144,10 @@ function Get-MethodPlan($e) {
     'shell-installer' { @("download-then-run $($a.url_win)") }
     'npx-skills'    { @("npx -y skills add $($a.repo) $($a.extra)") }
     'git-setup'     { @("git clone --depth 1 $($a.repo) $($a.dest)", "bash ./setup $($a.setup_args)") }
-    'git-symlink'   { @("git clone --depth 1 $($a.repo) $($a.clone_dest)", "link -> $($a.link)") }
+    'git-symlink'   {
+      $linkSrc = Join-ManifestSubpath $a.clone_dest $a.link_subpath
+      @("git clone --depth 1 $($a.repo) $($a.clone_dest)", "link $linkSrc -> $($a.link)")
+    }
     'npm-cli'       { @($a.command) }
     'od-mcp'        { @("od mcp install $($a.agent)") }
     'manual'        { @("MANUAL: $($e.manual.reason)") }
@@ -188,13 +196,16 @@ function Invoke-Entry($e) {
       }
       'git-symlink' {
         $clone = Expand-Home $a.clone_dest; $link = Expand-Home $a.link
+        $source = $clone
+        if (-not [string]::IsNullOrWhiteSpace($a.link_subpath)) { $source = Join-Path $clone $a.link_subpath }
         if (-not (Test-Path (Join-Path $clone '.git'))) { git clone --depth 1 $a.repo $clone }
+        if (-not (Test-Path $source)) { Write-Host "  git-symlink source missing: $source"; return 1 }
         $parent = Split-Path -Parent $link
         if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
         if (Test-Path $link) { Remove-Item -Recurse -Force $link }
         # symlink needs admin/dev-mode on Windows; fall back to a copy
-        try { New-Item -ItemType SymbolicLink -Path $link -Target $clone -ErrorAction Stop | Out-Null }
-        catch { Copy-Item -Recurse -Force $clone $link }
+        try { New-Item -ItemType SymbolicLink -Path $link -Target $source -ErrorAction Stop | Out-Null }
+        catch { Copy-Item -Recurse -Force $source $link }
         return 0
       }
       'npm-cli' {

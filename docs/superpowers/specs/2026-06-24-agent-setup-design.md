@@ -44,7 +44,7 @@ superpowers, ponytail, gstack, caveman, taste-skill, ui-ux-pro-max, open-design,
 | taste-skill | `npx-skills` — native | `npx-skills` — partial | `npx-skills` — native |
 | ui-ux-pro-max | `npm-cli` (`uipro init --ai claude --global`) — native | `--ai codex` — native | `--ai cursor` — native |
 | open-design | `od-mcp` (`od mcp install claude`) — partial¹ | `od mcp install codex` — partial¹ | `od mcp install cursor` — partial¹ |
-| prompt-polish | `claude-plugin` (host452b/prompt-polish) — native | `unsupported` | `unsupported` |
+| prompt-polish | `claude-plugin` (host452b/polish, installs `polish@polish`) — native | `codex-plugin` (host452b/polish, installs `polish@polish`) — partial | `git-symlink` (`skills/prompt-polish`) — native |
 
 ¹ open-design requires the `od` binary present **and** PATH-shadow resolved (`/usr/bin/od` is the unix octal-dump tool). If `od` is absent or shadowed → degrade to `manual`.
 

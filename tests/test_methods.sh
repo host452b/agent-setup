@@ -10,6 +10,11 @@ out="$(method_plan "$gs")"
 assert_contains "$out" "git clone --depth 1 https://github.com/garrytan/gstack.git" "git clone"
 assert_contains "$out" "./setup --host cursor" "setup args"
 
+sy='{"method":"git-symlink","args":{"repo":"https://github.com/host452b/polish.git","clone_dest":"${HOME}/.agent-setup/repos/polish","link_subpath":"skills/prompt-polish","link":"${HOME}/.cursor/skills/prompt-polish"}}'
+out="$(method_plan "$sy")"
+assert_contains "$out" 'git clone --depth 1 https://github.com/host452b/polish.git ${HOME}/.agent-setup/repos/polish' "git-symlink clone"
+assert_contains "$out" 'ln -sfn ${HOME}/.agent-setup/repos/polish/skills/prompt-polish ${HOME}/.cursor/skills/prompt-polish' "git-symlink subpath link"
+
 sh='{"method":"shell-installer","args":{"url_unix":"https://example.com/install.sh"}}'
 assert_contains "$(method_plan "$sh")" "download-then-run https://example.com/install.sh" "shell installer"
 

@@ -404,9 +404,9 @@ Expected: FAIL — `lib/manifest.sh` missing.
         "claude": {
           "method": "claude-plugin", "coverage": "native",
           "platforms": ["darwin","linux","wsl","windows"], "requires": ["claude","jq"],
-          "args": { "marketplace_src": "host452b/prompt-polish", "marketplace_name": "prompt-polish", "plugin": "prompt-polish" },
+          "args": { "marketplace_src": "host452b/polish", "marketplace_name": "polish", "plugin": "polish" },
           "safety": { "risk": "low", "network": true, "executes_remote_code": false, "requires_admin": false, "requires_confirmation": false },
-          "checks": { "after": [ { "type": "claude_plugin_installed", "name": "prompt-polish" } ] },
+          "checks": { "after": [ { "type": "claude_plugin_installed", "name": "polish" } ] },
           "conflict_policy": "skip"
         }
       }

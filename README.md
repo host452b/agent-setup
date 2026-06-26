@@ -62,7 +62,7 @@ Requires `jq` (the installer prints an install hint if it's missing).
 | taste-skill | ✅ auto ² | ✅ auto ² | ✅ auto ² |
 | ui-ux-pro-max | ✅ native | ✅ native | ✅ native |
 | open-design | 📋 manual | 📋 manual | 📋 manual |
-| prompt-polish | ✅ native | ⚠️ partial | ✅ native |
+| prompt-polish (via polish) | ✅ native | ⚠️ partial | ✅ native |
 
 `native` = fully scripted · `partial` = scripted with a trust/interactive step · `manual` = the installer prints exact steps (no CLI exists) · `N/A` = the tool itself has no support for that agent (reported as N/A, not a failure).
 
@@ -119,7 +119,7 @@ The `curl … | bash` one-liner is itself pipe-to-shell; the inspect-first and `
 - ✅ **Bootstrap** (`bootstrap.sh`) — the one-line installer.
 - 🧪 **Native Windows** (`install.ps1` + `bootstrap.ps1`) — experimental, mirrors the unix driver (reads the same `manifest.json` via `ConvertFrom-Json`, no jq needed). Pure-function unit tests in `tests/windows-test.ps1`.
 
-**Windows notes:** `git-symlink` (prompt-polish/cursor) needs Developer Mode or admin for real symlinks — otherwise it falls back to a copy. `gstack` runs its bash `setup`, so it needs **Git for Windows** (bash on PATH); without it that step skips with a note. `bun`/agent installers use their PowerShell installers.
+**Windows notes:** `git-symlink` (polish -> prompt-polish/cursor) needs Developer Mode or admin for real symlinks — otherwise it falls back to a copy. `gstack` runs its bash `setup`, so it needs **Git for Windows** (bash on PATH); without it that step skips with a note. `bun`/agent installers use their PowerShell installers.
 
 ## Repo layout
 

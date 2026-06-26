@@ -575,9 +575,9 @@
             "jq"
           ],
           "args": {
-            "marketplace_src": "host452b/prompt-polish",
-            "marketplace_name": "prompt-polish",
-            "plugin": "prompt-polish"
+            "marketplace_src": "host452b/polish",
+            "marketplace_name": "polish",
+            "plugin": "polish"
           },
           "safety": {
             "risk": "low",
@@ -590,7 +590,7 @@
             "after": [
               {
                 "type": "claude_plugin_installed",
-                "name": "prompt-polish"
+                "name": "polish"
               }
             ]
           },
@@ -609,9 +609,9 @@
             "codex"
           ],
           "args": {
-            "marketplace_src": "host452b/prompt-polish",
-            "marketplace_name": "prompt-polish",
-            "plugin": "prompt-polish"
+            "marketplace_src": "host452b/polish",
+            "marketplace_name": "polish",
+            "plugin": "polish"
           },
           "safety": {
             "risk": "medium",
@@ -624,7 +624,7 @@
             "after": [
               {
                 "type": "codex_plugin_installed",
-                "name": "prompt-polish"
+                "name": "polish"
               }
             ]
           },
@@ -643,8 +643,9 @@
             "git"
           ],
           "args": {
-            "repo": "https://github.com/host452b/prompt-polish.git",
-            "clone_dest": "${HOME}/.agent-setup/repos/prompt-polish",
+            "repo": "https://github.com/host452b/polish.git",
+            "clone_dest": "${HOME}/.agent-setup/repos/polish",
+            "link_subpath": "skills/prompt-polish",
             "link": "${HOME}/.cursor/skills/prompt-polish"
           },
           "safety": {

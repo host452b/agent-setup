@@ -55,11 +55,14 @@ _exec_entry() {
       # run via sh -c so quoted globs like --skill '*' stay literal (no filename expansion)
       sh -c "npx -y skills add '$(_arg "$e" '.args.repo')' $(_arg "$e" '.args.extra')" ;;
     git-symlink)
-      local gs_repo gs_clone gs_link
+      local gs_repo gs_clone gs_link gs_subpath gs_src
       gs_repo="$(_arg "$e" '.args.repo')"; gs_clone="$(_expand "$(_arg "$e" '.args.clone_dest')")"; gs_link="$(_expand "$(_arg "$e" '.args.link')")"
+      gs_subpath="$(_arg "$e" '.args.link_subpath')"
+      gs_src="$gs_clone"; [ -n "$gs_subpath" ] && gs_src="${gs_clone%/}/${gs_subpath#/}"
       if [ -d "$gs_clone/.git" ]; then git -C "$gs_clone" pull --ff-only --quiet || true; else git clone --depth 1 "$gs_repo" "$gs_clone"; fi
+      [ -e "$gs_src" ] || { echo "  git-symlink source missing: $gs_src" >&2; return 1; }
       mkdir -p "$(dirname "$gs_link")"
-      ln -sfn "$gs_clone" "$gs_link" ;;
+      ln -sfn "$gs_src" "$gs_link" ;;
     git-setup)
       local repo dest sa; repo="$(_arg "$e" '.args.repo')"; dest="$(_expand "$(_arg "$e" '.args.dest')")"; sa="$(_arg "$e" '.args.setup_args')"
       [ -d "$dest/.git" ] || git clone --depth 1 "$repo" "$dest"

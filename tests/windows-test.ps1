@@ -31,6 +31,19 @@ $cx = [pscustomobject]@{ method='codex-plugin'; args=[pscustomobject]@{ marketpl
 $lines = Get-MethodPlan $cx
 Assert-True ($lines -contains 'codex plugin add superpowers@superpowers-dev') 'codex-plugin @marketplace line'
 
+$sy = [pscustomobject]@{
+  method='git-symlink'
+  args=[pscustomobject]@{
+    repo='https://github.com/host452b/polish.git'
+    clone_dest='${HOME}/.agent-setup/repos/polish'
+    link_subpath='skills/prompt-polish'
+    link='${HOME}/.cursor/skills/prompt-polish'
+  }
+}
+$lines = Get-MethodPlan $sy
+Assert-True ($lines -contains 'git clone --depth 1 https://github.com/host452b/polish.git ${HOME}/.agent-setup/repos/polish') 'git-symlink clone line'
+Assert-True ($lines -contains 'link ${HOME}/.agent-setup/repos/polish/skills/prompt-polish -> ${HOME}/.cursor/skills/prompt-polish') 'git-symlink subpath line'
+
 $mn = [pscustomobject]@{ method='manual'; manual=[pscustomobject]@{ reason='no cli' } }
 Assert-True ((Get-MethodPlan $mn) -contains 'MANUAL: no cli') 'manual line'
 
